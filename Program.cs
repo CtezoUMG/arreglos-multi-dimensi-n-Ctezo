@@ -22,6 +22,8 @@ int maximo = numeros[0];
 
 
 // --- FIN DE LÓGICA DEL ALUMNO ---
-
+for (int i = 1; i < n; i++) {
+    if (numeros[i] > maximo) maximo = numeros[i];
+}
 // 2. Salida: Lo que el Autograding comparará
 Console.WriteLine(maximo);
