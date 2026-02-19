@@ -19,11 +19,6 @@ for (int i = 1; i < n; i++) {
     
 }
 
-int maximo = numeros[0]; 
-for (int i = 1; i < n; i++) {
-    if (numeros[i] > maximo) maximo = numeros[i];
-    
-}
 
 // Salida limpia (solo el número)
 Console.WriteLine(maximo);
