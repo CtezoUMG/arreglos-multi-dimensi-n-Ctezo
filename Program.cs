@@ -12,7 +12,6 @@ for (int i = 0; i < n; i++)
     numeros[i] = int.Parse(entrada[i]);
 }
 
-
 // Lógica para encontrar el máximo
 int maximo = numeros[0]; 
 for (int i = 1; i < n; i++) {
