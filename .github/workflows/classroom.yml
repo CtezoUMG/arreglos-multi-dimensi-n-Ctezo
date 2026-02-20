@@ -66,10 +66,10 @@ jobs:
         echo "==============================================================="
         
         # Extraer valores para el cálculo (Caso 1)
-        TIME_VAL=$(grep "User time" met1.txt | cut -d: -f2 | xargs)
-        RAM_VAL=$(grep "Maximum resident set size" met1.txt | cut -d: -f2 | xargs)
+        TIME_VAL=$(grep "User time" met1.txt | cut -d: -f2 | xargs || echo "0")
+        RAM_VAL=$(grep "Maximum resident set size" met1.txt | cut -d: -f2 | xargs || echo "0")
         
-        # Calcular Score Olímpico usando AWK (para manejar decimales)
+        # Calcular Score Olímpico usando AWK
         SCORE=$(awk -v t="$TIME_VAL" -v r="$RAM_VAL" 'BEGIN { printf "%.2f", (t * 1000) + (r / 1024) }')
 
         echo "1. PRUEBA: VALOR MÁXIMO ESTÁNDAR"
@@ -96,10 +96,6 @@ jobs:
         echo "Fórmula aplicada: ($TIME_VAL x 1000) + ($RAM_VAL / 1024)"
         echo "Recuerda: Menor Score = Mayor Eficiencia."
         echo "==============================================================="
-
-    - name: Autograding Reporter
-      uses: classroom-resources/autograding-grading-reporter@v1
-      # ... resto del archivo igual
 
     - name: Autograding Reporter
       uses: classroom-resources/autograding-grading-reporter@v1
