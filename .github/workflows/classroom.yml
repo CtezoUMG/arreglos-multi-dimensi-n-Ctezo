@@ -15,14 +15,18 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    # Compilación única inicial
+    - name: Pre-compilar Release
+      run: dotnet build -c Release
+
     # Caso 1: Valor Máximo Estándar
     - name: Valor Maximo Estandar
       id: valor-maximo-estandar
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: "Valor Maximo Estandar"
-        setup-command: "dotnet build -c Release"
-        command: "/usr/bin/time -v ./bin/Release/net10.0/TestArreglo 2>&1"
+        # Guardamos salida en out1 y métricas en met1
+        command: "/usr/bin/time -v ./bin/Release/net10.0/TestArreglo > out1.txt 2> met1.txt && cat out1.txt"
         input: "5\n10 20 5 8 15"
         expected-output: "20"
         comparison-method: contains
@@ -35,8 +39,7 @@ jobs:
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: "Maximo con Negativos"
-        setup-command: "dotnet build -c Release"
-        command: "/usr/bin/time -v ./bin/Release/net10.0/TestArreglo 2>&1"
+        command: "/usr/bin/time -v ./bin/Release/net10.0/TestArreglo > out2.txt 2> met2.txt && cat out2.txt"
         input: "3\n-10 -5 -30"
         expected-output: "-5"
         comparison-method: contains
@@ -49,13 +52,29 @@ jobs:
       uses: classroom-resources/autograding-io-grader@v1
       with:
         test-name: "Arreglo de un elemento"
-        setup-command: "dotnet build -c Release"
-        command: "/usr/bin/time -v ./bin/Release/net10.0/TestArreglo 2>&1"
+        command: "/usr/bin/time -v ./bin/Release/net10.0/TestArreglo > out3.txt 2> met3.txt && cat out3.txt"
         input: "1\n99"
         expected-output: "99"
         comparison-method: contains
         timeout: 10
         max-score: 30
+
+    # PASO CLAVE: Este paso imprime las métricas que el grader escondía
+    - name: 📊 Reporte de Eficiencia (CPU y RAM)
+      if: always()
+      run: |
+        echo "===================================================="
+        echo "🏆 MÉTRICAS DE RENDIMIENTO POR CASO"
+        echo "===================================================="
+        echo "1. VALOR MÁXIMO ESTÁNDAR:"
+        grep -E "User time|Maximum resident set size" met1.txt || echo "Sin datos"
+        echo "----------------------------------------------------"
+        echo "2. MÁXIMO CON NEGATIVOS:"
+        grep -E "User time|Maximum resident set size" met2.txt || echo "Sin datos"
+        echo "----------------------------------------------------"
+        echo "3. ARREGLO DE UN ELEMENTO:"
+        grep -E "User time|Maximum resident set size" met3.txt || echo "Sin datos"
+        echo "===================================================="
 
     - name: Autograding Reporter
       uses: classroom-resources/autograding-grading-reporter@v1
