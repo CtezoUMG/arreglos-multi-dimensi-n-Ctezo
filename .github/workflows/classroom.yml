@@ -57,7 +57,7 @@ jobs:
         timeout: 10
         max-score: 30
 
-    # REPORTE DE EFICIENCIA UNIFICADO
+    # REPORTE FINAL UNIFICADO CON CÁLCULO AUTOMÁTICO
     - name: 📊 REPORTE DE EFICIENCIA Y LÓGICA
       if: always()
       run: |
@@ -65,6 +65,13 @@ jobs:
         echo "   AUDITORÍA TÉCNICA DE ALGORITMOS - UMG PROGRA III"
         echo "==============================================================="
         
+        # Extraer valores para el cálculo (Caso 1)
+        TIME_VAL=$(grep "User time" met1.txt | cut -d: -f2 | xargs)
+        RAM_VAL=$(grep "Maximum resident set size" met1.txt | cut -d: -f2 | xargs)
+        
+        # Calcular Score Olímpico usando AWK (para manejar decimales)
+        SCORE=$(awk -v t="$TIME_VAL" -v r="$RAM_VAL" 'BEGIN { printf "%.2f", (t * 1000) + (r / 1024) }')
+
         echo "1. PRUEBA: VALOR MÁXIMO ESTÁNDAR"
         echo "   📥 Entrada: [10, 20, 5, 8, 15] | 🎯 Esperado: 20"
         echo -n "   📤 Resultado del Alumno: " && cat out1.txt
@@ -83,10 +90,16 @@ jobs:
         grep -E "User time|Maximum resident set size|Percent of CPU" met3.txt | sed 's/\t//g'
         
         echo ""
-        echo "🏆 CÁLCULO DE SCORE OLÍMPICO (Basado en Caso 1):"
-        echo "Fórmula: (User Time x 1000) + (RAM / 1024)"
-        echo "Nota: El número más bajo indica mayor eficiencia."
+        echo "🏆 RESULTADO FINAL PARA EL RANKING:"
+        echo ">>>> SCORE OLÍMPICO: $SCORE <<<<"
+        echo "---------------------------------------------------------------"
+        echo "Fórmula aplicada: ($TIME_VAL x 1000) + ($RAM_VAL / 1024)"
+        echo "Recuerda: Menor Score = Mayor Eficiencia."
         echo "==============================================================="
+
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      # ... resto del archivo igual
 
     - name: Autograding Reporter
       uses: classroom-resources/autograding-grading-reporter@v1
