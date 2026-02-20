@@ -57,33 +57,30 @@ jobs:
         timeout: 10
         max-score: 30
 
-    # REPORTE FINAL UNIFICADO Y DETALLADO
-    - name: 📊 REPORTE DETALLADO DE EVALUACIÓN
+    # REPORTE FINAL UNIFICADO CON % DE CPU
+    - name: 📊 REPORTE DE EFICIENCIA Y LÓGICA
       if: always()
       run: |
         echo "==============================================================="
-        echo "   BITÁCORA DE EJECUCIÓN - PROGRAMACIÓN III"
+        echo "   AUDITORÍA TÉCNICA DE ALGORITMOS - UMG PROGRA III"
         echo "==============================================================="
         
         echo "1. PRUEBA: VALOR MÁXIMO ESTÁNDAR"
-        echo "   📥 Entrada: [10, 20, 5, 8, 15]"
-        echo "   🎯 Esperado: 20"
-        echo -n "   📤 Obtenido: " && cat out1.txt
-        grep -E "User time|Maximum resident set size" met1.txt | sed 's/\t//g'
+        echo "   📥 Entrada: [10, 20, 5, 8, 15] | 🎯 Esperado: 20"
+        echo -n "   📤 Resultado del Alumno: " && cat out1.txt
+        grep -E "User time|Maximum resident set size|Percent of CPU" met1.txt | sed 's/\t//g'
         echo "---------------------------------------------------------------"
 
         echo "2. PRUEBA: MÁXIMO CON NEGATIVOS"
-        echo "   📥 Entrada: [-10, -5, -30]"
-        echo "   🎯 Esperado: -5"
-        echo -n "   📤 Obtenido: " && cat out2.txt
-        grep -E "User time|Maximum resident set size" met2.txt | sed 's/\t//g'
+        echo "   📥 Entrada: [-10, -5, -30] | 🎯 Esperado: -5"
+        echo -n "   📤 Resultado del Alumno: " && cat out2.txt
+        grep -E "User time|Maximum resident set size|Percent of CPU" met2.txt | sed 's/\t//g'
         echo "---------------------------------------------------------------"
 
         echo "3. PRUEBA: ELEMENTO ÚNICO"
-        echo "   📥 Entrada: [99]"
-        echo "   🎯 Esperado: 99"
-        echo -n "   📤 Obtenido: " && cat out3.txt
-        grep -E "User time|Maximum resident set size" met3.txt | sed 's/\t//g'
+        echo "   📥 Entrada: [99] | 🎯 Esperado: 99"
+        echo -n "   📤 Resultado del Alumno: " && cat out3.txt
+        grep -E "User time|Maximum resident set size|Percent of CPU" met3.txt | sed 's/\t//g'
         echo "==============================================================="
 
     - name: Autograding Reporter
