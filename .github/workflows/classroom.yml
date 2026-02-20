@@ -57,7 +57,7 @@ jobs:
         timeout: 10
         max-score: 30
 
-    # REPORTE FINAL UNIFICADO CON CÁLCULO AUTOMÁTICO
+    # REPORTE FINAL UNIFICADO CON INTENTOS Y SCORE
     - name: 📊 REPORTE DE EFICIENCIA Y LÓGICA
       if: always()
       run: |
@@ -69,9 +69,14 @@ jobs:
         TIME_VAL=$(grep "User time" met1.txt | cut -d: -f2 | xargs || echo "0")
         RAM_VAL=$(grep "Maximum resident set size" met1.txt | cut -d: -f2 | xargs || echo "0")
         
-        # Calcular Score Olímpico usando AWK
+        # Calcular Score Olímpico
         SCORE=$(awk -v t="$TIME_VAL" -v r="$RAM_VAL" 'BEGIN { printf "%.2f", (t * 1000) + (r / 1024) }')
 
+        # Obtener el número de intento (Run Number)
+        INTENTO="${{ github.run_number }}"
+
+        echo "🚀 INTENTO NÚMERO: $INTENTO"
+        echo "---------------------------------------------------------------"
         echo "1. PRUEBA: VALOR MÁXIMO ESTÁNDAR"
         echo "   📥 Entrada: [10, 20, 5, 8, 15] | 🎯 Esperado: 20"
         echo -n "   📤 Resultado del Alumno: " && cat out1.txt
@@ -92,9 +97,9 @@ jobs:
         echo ""
         echo "🏆 RESULTADO FINAL PARA EL RANKING:"
         echo ">>>> SCORE OLÍMPICO: $SCORE <<<<"
+        echo ">>>> LOGRADO AL INTENTO: $INTENTO <<<<"
         echo "---------------------------------------------------------------"
-        echo "Fórmula aplicada: ($TIME_VAL x 1000) + ($RAM_VAL / 1024)"
-        echo "Recuerda: Menor Score = Mayor Eficiencia."
+        echo "Fórmula: (User Time x 1000) + (RAM / 1024)"
         echo "==============================================================="
 
     - name: Autograding Reporter
