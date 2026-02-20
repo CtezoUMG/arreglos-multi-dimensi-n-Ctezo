@@ -54,7 +54,7 @@ jobs:
         comparison-method: contains
         timeout: 10
         max-score: 30
-
+           
 # --- REPORTE DETALLADO CON PROMEDIOS Y TIEMPOS INDIVIDUALES ---
     - name: 📊 REPORTE DE EFICIENCIA Y LÓGICA
       if: always()
@@ -104,7 +104,30 @@ jobs:
         echo ">>>> SCORE OLÍMPICO PRO: $SCORE <<<<"
         echo ">>>> LOGRADO AL INTENTO: ${{ github.run_number }} <<<<"
         echo "==============================================================="
-
+# --- ENVÍO AL TABLERO CENTRAL ---
+    - name: 🌐 Sincronizar con Tablero Central
+      if: always()
+      run: |
+        # Preparamos el JSON con los datos promediados
+        JSON_PAYLOAD=$(cat <<EOF
+        {
+          "fecha": "$(date -u +'%d/%m/%Y %H:%M')",
+          "usuario": "${{ github.actor }}",
+          "intento": ${{ github.run_number }},
+          "score": "$SCORE",
+          "tiempo_avg": "${AVG_TIME}s",
+          "ram_avg": "${AVG_RAM}KB",
+          "cpu_avg": "${AVG_CPU}%"
+        }
+        EOF
+        )
+        
+        # Enviamos a Google Sheets mediante CURL
+        # REEMPLAZA LA URL DE ABAJO POR LA DE TU APPS SCRIPT
+        curl -L -X POST "https://script.google.com/macros/s/AKfycbwgKABgEL8GnF8fUkccLz8e34anoIUE9uzonIM75Rk01fcbvrJdlo7JsSemRUNYBkVN/exec" \
+             -H "Content-Type: application/json" \
+             -d "$JSON_PAYLOAD"
+             
     - name: Autograding Reporter
       uses: classroom-resources/autograding-grading-reporter@v1
       env:
