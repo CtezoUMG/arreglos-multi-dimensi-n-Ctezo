@@ -55,7 +55,7 @@ jobs:
         timeout: 10
         max-score: 30
 
-    # --- REPORTE DETALLADO (Lógica + Eficiencia) ---
+    # --- REPORTE DETALLADO Y RESUMEN DE EFICIENCIA ---
     - name: 📊 REPORTE DE EFICIENCIA Y LÓGICA
       if: always()
       run: |
@@ -63,12 +63,12 @@ jobs:
         echo "   AUDITORÍA TÉCNICA DE ALGORITMOS - UMG PROGRA III"
         echo "==============================================================="
         
-        # Extraer valores técnicos para el Score (basado en Caso 1)
+        # Extraer valores para el cálculo de Score (Caso 1 como base)
         TIME_VAL=$(grep "User time" met1.txt | cut -d: -f2 | xargs || echo "0")
         RAM_VAL=$(grep "Maximum resident set size" met1.txt | cut -d: -f2 | xargs || echo "0")
         CPU_VAL=$(grep "Percent of CPU" met1.txt | cut -d: -f2 | tr -d '%' | xargs || echo "0")
         
-        # Cálculo de Score Olímpico Pro
+        # Calcular Score Olímpico Pro: (ms * 1.0) + (RAM_MB * 0.5) + (%CPU * 0.2)
         SCORE=$(awk -v t="$TIME_VAL" -v r="$RAM_VAL" -v c="$CPU_VAL" \
           'BEGIN { printf "%.2f", (t * 1000 * 1.0) + ((r / 1024) * 0.5) + (c * 0.2) }')
 
@@ -77,23 +77,29 @@ jobs:
         
         echo "1. PRUEBA: VALOR MÁXIMO ESTÁNDAR"
         echo "   📥 Entrada: [10, 20, 5, 8, 15] | 🎯 Esperado: 20"
-        echo -n "   📤 Obtenido: " && cat out1.txt
-        echo "   ⏱️ CPU: ${CPU_VAL}% | RAM: ${RAM_VAL}KB | Tiempo: ${TIME_VAL}s"
+        echo -n "   📤 Resultado del Alumno: " && cat out1.txt
+        grep -E "User time|Maximum resident set size|Percent of CPU" met1.txt | sed 's/\t//g'
         echo "---------------------------------------------------------------"
 
         echo "2. PRUEBA: MÁXIMO CON NEGATIVOS"
         echo "   📥 Entrada: [-10, -5, -30] | 🎯 Esperado: -5"
-        echo -n "   📤 Obtenido: " && cat out2.txt
+        echo -n "   📤 Resultado del Alumno: " && cat out2.txt
+        grep -E "User time|Maximum resident set size|Percent of CPU" met2.txt | sed 's/\t//g'
         echo "---------------------------------------------------------------"
 
         echo "3. PRUEBA: ELEMENTO ÚNICO"
         echo "   📥 Entrada: [99] | 🎯 Esperado: 99"
-        echo -n "   📤 Obtenido: " && cat out3.txt
+        echo -n "   📤 Resultado del Alumno: " && cat out3.txt
+        grep -E "User time|Maximum resident set size|Percent of CPU" met3.txt | sed 's/\t//g'
         
         echo ""
-        echo "🏆 MÉTRICAS FINALES PARA RANKING:"
+        echo "==============================================================="
+        echo "🏆 RESUMEN DE RENDIMIENTO PARA RANKING"
+        echo "==============================================================="
         echo ">>>> SCORE OLÍMPICO PRO: $SCORE <<<<"
         echo ">>>> LOGRADO AL INTENTO: ${{ github.run_number }} <<<<"
+        echo "---------------------------------------------------------------"
+        echo "Fórmula: (ms * 1.0) + (RAM_MB * 0.5) + (%CPU * 0.2)"
         echo "==============================================================="
 
     - name: Autograding Reporter
