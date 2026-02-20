@@ -18,7 +18,7 @@ jobs:
     - name: Pre-compilar Release
       run: dotnet build -c Release
 
-    # --- CASOS DE PRUEBA ---
+    # --- EJECUCIÓN DE PRUEBAS ---
     - name: Valor Maximo Estandar
       id: valor-maximo-estandar
       uses: classroom-resources/autograding-io-grader@v1
@@ -55,7 +55,7 @@ jobs:
         timeout: 10
         max-score: 30
 
-    # --- REPORTE CON MÉTRICA DE CPU ---
+    # --- REPORTE DETALLADO (Lógica + Eficiencia) ---
     - name: 📊 REPORTE DE EFICIENCIA Y LÓGICA
       if: always()
       run: |
@@ -63,27 +63,36 @@ jobs:
         echo "   AUDITORÍA TÉCNICA DE ALGORITMOS - UMG PROGRA III"
         echo "==============================================================="
         
-        # Extraer valores técnicos del Caso 1
+        # Extraer valores técnicos para el Score (basado en Caso 1)
         TIME_VAL=$(grep "User time" met1.txt | cut -d: -f2 | xargs || echo "0")
         RAM_VAL=$(grep "Maximum resident set size" met1.txt | cut -d: -f2 | xargs || echo "0")
         CPU_VAL=$(grep "Percent of CPU" met1.txt | cut -d: -f2 | tr -d '%' | xargs || echo "0")
         
-        # NUEVA FÓRMULA DE SCORE (Incluyendo CPU)
-        # (ms * 1.0) + (RAM_MB * 0.5) + (%CPU * 0.2)
+        # Cálculo de Score Olímpico Pro
         SCORE=$(awk -v t="$TIME_VAL" -v r="$RAM_VAL" -v c="$CPU_VAL" \
           'BEGIN { printf "%.2f", (t * 1000 * 1.0) + ((r / 1024) * 0.5) + (c * 0.2) }')
 
         echo "🚀 INTENTO NÚMERO: ${{ github.run_number }}"
         echo "---------------------------------------------------------------"
-        echo "1. RESULTADOS TÉCNICOS (Caso 1):"
-        echo "   ⏱️ Tiempo: ${TIME_VAL}s"
-        echo "   ⚡ CPU: ${CPU_VAL}%"
-        echo "   🧠 RAM: ${RAM_VAL} KB"
+        
+        echo "1. PRUEBA: VALOR MÁXIMO ESTÁNDAR"
+        echo "   📥 Entrada: [10, 20, 5, 8, 15] | 🎯 Esperado: 20"
+        echo -n "   📤 Obtenido: " && cat out1.txt
+        echo "   ⏱️ CPU: ${CPU_VAL}% | RAM: ${RAM_VAL}KB | Tiempo: ${TIME_VAL}s"
         echo "---------------------------------------------------------------"
+
+        echo "2. PRUEBA: MÁXIMO CON NEGATIVOS"
+        echo "   📥 Entrada: [-10, -5, -30] | 🎯 Esperado: -5"
+        echo -n "   📤 Obtenido: " && cat out2.txt
+        echo "---------------------------------------------------------------"
+
+        echo "3. PRUEBA: ELEMENTO ÚNICO"
+        echo "   📥 Entrada: [99] | 🎯 Esperado: 99"
+        echo -n "   📤 Obtenido: " && cat out3.txt
         
         echo ""
-        echo "🏆 RESULTADO FINAL PARA EL RANKING:"
-        echo ">>>> SCORE OLÍMPICO: $SCORE <<<<"
+        echo "🏆 MÉTRICAS FINALES PARA RANKING:"
+        echo ">>>> SCORE OLÍMPICO PRO: $SCORE <<<<"
         echo ">>>> LOGRADO AL INTENTO: ${{ github.run_number }} <<<<"
         echo "==============================================================="
 
