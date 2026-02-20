@@ -109,24 +109,17 @@ jobs:
       if: always()
       run: |
         # Preparamos el JSON con los datos promediados
-        JSON_PAYLOAD=$(cat <<EOF
-        {
-          "fecha": "$(date -u +'%d/%m/%Y %H:%M')",
-          "usuario": "${{ github.actor }}",
-          "intento": ${{ github.run_number }},
-          "score": "$SCORE",
-          "tiempo_avg": "${AVG_TIME}s",
-          "ram_avg": "${AVG_RAM}KB",
-          "cpu_avg": "${AVG_CPU}%"
-        }
-        EOF
-        )
-        
-        # Enviamos a Google Sheets mediante CURL
-        # REEMPLAZA LA URL DE ABAJO POR LA DE TU APPS SCRIPT
-        curl -L -X POST "https://script.google.com/macros/s/AKfycbwgKABgEL8GnF8fUkccLz8e34anoIUE9uzonIM75Rk01fcbvrJdlo7JsSemRUNYBkVN/exec" \
+        curl -L -X POST "URL_DE_TU_SCRIPT_AQUI" \
              -H "Content-Type: application/json" \
-             -d "$JSON_PAYLOAD"
+             -d "{
+                  \"fecha\": \"$(date -u +'%d/%m/%Y %H:%M')\",
+                  \"usuario\": \"${{ github.actor }}\",
+                  \"intento\": ${{ github.run_number }},
+                  \"score\": \"$SCORE\",
+                  \"tiempo_avg\": \"${AVG_TIME}s\",
+                  \"ram_avg\": \"${AVG_RAM}KB\",
+                  \"cpu_avg\": \"${AVG_CPU}%\"
+                }"
              
     - name: Autograding Reporter
       uses: classroom-resources/autograding-grading-reporter@v1
