@@ -18,7 +18,7 @@ jobs:
     - name: Pre-compilar Release
       run: dotnet build -c Release
 
-    # Caso 1
+    # Caso 1: Valor Máximo Estándar
     - name: Valor Maximo Estandar
       id: valor-maximo-estandar
       uses: classroom-resources/autograding-io-grader@v1
@@ -31,7 +31,7 @@ jobs:
         timeout: 10
         max-score: 40
 
-    # Caso 2
+    # Caso 2: Máximo con Negativos
     - name: Maximo con Negativos
       id: maximo-con-negativos
       uses: classroom-resources/autograding-io-grader@v1
@@ -44,7 +44,7 @@ jobs:
         timeout: 10
         max-score: 30
 
-    # Caso 3
+    # Caso 3: Elemento Único
     - name: Arreglo de un elemento
       id: arreglo-un-elemento
       uses: classroom-resources/autograding-io-grader@v1
@@ -57,7 +57,7 @@ jobs:
         timeout: 10
         max-score: 30
 
-    # REPORTE FINAL UNIFICADO CON % DE CPU
+    # REPORTE DE EFICIENCIA UNIFICADO
     - name: 📊 REPORTE DE EFICIENCIA Y LÓGICA
       if: always()
       run: |
@@ -81,6 +81,11 @@ jobs:
         echo "   📥 Entrada: [99] | 🎯 Esperado: 99"
         echo -n "   📤 Resultado del Alumno: " && cat out3.txt
         grep -E "User time|Maximum resident set size|Percent of CPU" met3.txt | sed 's/\t//g'
+        
+        echo ""
+        echo "🏆 CÁLCULO DE SCORE OLÍMPICO (Basado en Caso 1):"
+        echo "Fórmula: (User Time x 1000) + (RAM / 1024)"
+        echo "Nota: El número más bajo indica mayor eficiencia."
         echo "==============================================================="
 
     - name: Autograding Reporter
