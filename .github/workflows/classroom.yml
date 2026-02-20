@@ -55,7 +55,7 @@ jobs:
         timeout: 10
         max-score: 30
 
-    # --- REPORTE DETALLADO Y RESUMEN DE EFICIENCIA ---
+# --- REPORTE DETALLADO CON PROMEDIOS ---
     - name: 📊 REPORTE DE EFICIENCIA Y LÓGICA
       if: always()
       run: |
@@ -63,43 +63,46 @@ jobs:
         echo "   AUDITORÍA TÉCNICA DE ALGORITMOS - UMG PROGRA III"
         echo "==============================================================="
         
-        # Extraer valores para el cálculo de Score (Caso 1 como base)
-        TIME_VAL=$(grep "User time" met1.txt | cut -d: -f2 | xargs || echo "0")
-        RAM_VAL=$(grep "Maximum resident set size" met1.txt | cut -d: -f2 | xargs || echo "0")
-        CPU_VAL=$(grep "Percent of CPU" met1.txt | cut -d: -f2 | tr -d '%' | xargs || echo "0")
+        # Extraer valores de los 3 casos
+        T1=$(grep "User time" met1.txt | cut -d: -f2 | xargs)
+        T2=$(grep "User time" met2.txt | cut -d: -f2 | xargs)
+        T3=$(grep "User time" met3.txt | cut -d: -f2 | xargs)
         
-        # Calcular Score Olímpico Pro: (ms * 1.0) + (RAM_MB * 0.5) + (%CPU * 0.2)
-        SCORE=$(awk -v t="$TIME_VAL" -v r="$RAM_VAL" -v c="$CPU_VAL" \
+        R1=$(grep "Maximum resident set size" met1.txt | cut -d: -f2 | xargs)
+        R2=$(grep "Maximum resident set size" met2.txt | cut -d: -f2 | xargs)
+        R3=$(grep "Maximum resident set size" met3.txt | cut -d: -f2 | xargs)
+        
+        C1=$(grep "Percent of CPU" met1.txt | cut -d: -f2 | tr -d '%' | xargs)
+        C2=$(grep "Percent of CPU" met2.txt | cut -d: -f2 | tr -d '%' | xargs)
+        C3=$(grep "Percent of CPU" met3.txt | cut -d: -f2 | tr -d '%' | xargs)
+        
+        # Calcular Promedios usando AWK
+        AVG_TIME=$(awk -v a="$T1" -v b="$T2" -v c="$T3" 'BEGIN { printf "%.3f", (a+b+c)/3 }')
+        AVG_RAM=$(awk -v a="$R1" -v b="$R2" -v c="$R3" 'BEGIN { printf "%.2f", (a+b+c)/3 }')
+        AVG_CPU=$(awk -v a="$C1" -v b="$C2" -v c="$C3" 'BEGIN { printf "%.2f", (a+b+c)/3 }')
+        
+        # Calcular Score Olímpico Pro con los promedios
+        SCORE=$(awk -v t="$AVG_TIME" -v r="$AVG_RAM" -v c="$AVG_CPU" \
           'BEGIN { printf "%.2f", (t * 1000 * 1.0) + ((r / 1024) * 0.5) + (c * 0.2) }')
 
         echo "🚀 INTENTO NÚMERO: ${{ github.run_number }}"
         echo "---------------------------------------------------------------"
-        
-        echo "1. PRUEBA: VALOR MÁXIMO ESTÁNDAR"
-        echo "   📥 Entrada: [10, 20, 5, 8, 15] | 🎯 Esperado: 20"
-        echo -n "   📤 Resultado del Alumno: " && cat out1.txt
-        grep -E "User time|Maximum resident set size|Percent of CPU" met1.txt | sed 's/\t//g'
+        echo "1. PRUEBA ESTÁNDAR: [Obtenido: $(cat out1.txt)] | CPU: ${C1}% | RAM: ${R1}KB"
+        echo "2. PRUEBA NEGATIVOS: [Obtenido: $(cat out2.txt)] | CPU: ${C2}% | RAM: ${R2}KB"
+        echo "3. PRUEBA ÚNICO:    [Obtenido: $(cat out3.txt)] | CPU: ${C3}% | RAM: ${R3}KB"
         echo "---------------------------------------------------------------"
-
-        echo "2. PRUEBA: MÁXIMO CON NEGATIVOS"
-        echo "   📥 Entrada: [-10, -5, -30] | 🎯 Esperado: -5"
-        echo -n "   📤 Resultado del Alumno: " && cat out2.txt
-        grep -E "User time|Maximum resident set size|Percent of CPU" met2.txt | sed 's/\t//g'
-        echo "---------------------------------------------------------------"
-
-        echo "3. PRUEBA: ELEMENTO ÚNICO"
-        echo "   📥 Entrada: [99] | 🎯 Esperado: 99"
-        echo -n "   📤 Resultado del Alumno: " && cat out3.txt
-        grep -E "User time|Maximum resident set size|Percent of CPU" met3.txt | sed 's/\t//g'
         
         echo ""
         echo "==============================================================="
-        echo "🏆 RESUMEN DE RENDIMIENTO PARA RANKING"
+        echo "📊 PROMEDIOS DE RENDIMIENTO"
         echo "==============================================================="
+        echo "⏱️ Tiempo Promedio: ${AVG_TIME}s"
+        echo "🧠 RAM Promedio:    ${AVG_RAM} KB"
+        echo "⚡ CPU Promedio:    ${AVG_CPU}%"
+        echo "---------------------------------------------------------------"
+        echo "🏆 RESULTADO FINAL PARA EL RANKING"
         echo ">>>> SCORE OLÍMPICO PRO: $SCORE <<<<"
         echo ">>>> LOGRADO AL INTENTO: ${{ github.run_number }} <<<<"
-        echo "---------------------------------------------------------------"
-        echo "Fórmula: (ms * 1.0) + (RAM_MB * 0.5) + (%CPU * 0.2)"
         echo "==============================================================="
 
     - name: Autograding Reporter
