@@ -55,7 +55,7 @@ jobs:
         timeout: 10
         max-score: 30
 
-# --- REPORTE DETALLADO CON PROMEDIOS ---
+# --- REPORTE DETALLADO CON PROMEDIOS Y TIEMPOS INDIVIDUALES ---
     - name: 📊 REPORTE DE EFICIENCIA Y LÓGICA
       if: always()
       run: |
@@ -64,17 +64,17 @@ jobs:
         echo "==============================================================="
         
         # Extraer valores de los 3 casos
-        T1=$(grep "User time" met1.txt | cut -d: -f2 | xargs)
-        T2=$(grep "User time" met2.txt | cut -d: -f2 | xargs)
-        T3=$(grep "User time" met3.txt | cut -d: -f2 | xargs)
+        T1=$(grep "User time" met1.txt | cut -d: -f2 | xargs || echo "0")
+        T2=$(grep "User time" met2.txt | cut -d: -f2 | xargs || echo "0")
+        T3=$(grep "User time" met3.txt | cut -d: -f2 | xargs || echo "0")
         
-        R1=$(grep "Maximum resident set size" met1.txt | cut -d: -f2 | xargs)
-        R2=$(grep "Maximum resident set size" met2.txt | cut -d: -f2 | xargs)
-        R3=$(grep "Maximum resident set size" met3.txt | cut -d: -f2 | xargs)
+        R1=$(grep "Maximum resident set size" met1.txt | cut -d: -f2 | xargs || echo "0")
+        R2=$(grep "Maximum resident set size" met2.txt | cut -d: -f2 | xargs || echo "0")
+        R3=$(grep "Maximum resident set size" met3.txt | cut -d: -f2 | xargs || echo "0")
         
-        C1=$(grep "Percent of CPU" met1.txt | cut -d: -f2 | tr -d '%' | xargs)
-        C2=$(grep "Percent of CPU" met2.txt | cut -d: -f2 | tr -d '%' | xargs)
-        C3=$(grep "Percent of CPU" met3.txt | cut -d: -f2 | tr -d '%' | xargs)
+        C1=$(grep "Percent of CPU" met1.txt | cut -d: -f2 | tr -d '%' | xargs || echo "0")
+        C2=$(grep "Percent of CPU" met2.txt | cut -d: -f2 | tr -d '%' | xargs || echo "0")
+        C3=$(grep "Percent of CPU" met3.txt | cut -d: -f2 | tr -d '%' | xargs || echo "0")
         
         # Calcular Promedios usando AWK
         AVG_TIME=$(awk -v a="$T1" -v b="$T2" -v c="$T3" 'BEGIN { printf "%.3f", (a+b+c)/3 }')
@@ -87,14 +87,14 @@ jobs:
 
         echo "🚀 INTENTO NÚMERO: ${{ github.run_number }}"
         echo "---------------------------------------------------------------"
-        echo "1. PRUEBA ESTÁNDAR: [Obtenido: $(cat out1.txt)] | CPU: ${C1}% | RAM: ${R1}KB"
-        echo "2. PRUEBA NEGATIVOS: [Obtenido: $(cat out2.txt)] | CPU: ${C2}% | RAM: ${R2}KB"
-        echo "3. PRUEBA ÚNICO:    [Obtenido: $(cat out3.txt)] | CPU: ${C3}% | RAM: ${R3}KB"
+        echo "1. PRUEBA ESTÁNDAR:  [OUT: $(cat out1.txt)] | T: ${T1}s | CPU: ${C1}% | RAM: ${R1}KB"
+        echo "2. PRUEBA NEGATIVOS: [OUT: $(cat out2.txt)] | T: ${T2}s | CPU: ${C2}% | RAM: ${R2}KB"
+        echo "3. PRUEBA ÚNICO:     [OUT: $(cat out3.txt)] | T: ${T3}s | CPU: ${C3}% | RAM: ${R3}KB"
         echo "---------------------------------------------------------------"
         
         echo ""
         echo "==============================================================="
-        echo "📊 PROMEDIOS DE RENDIMIENTO"
+        echo "📊 PROMEDIOS DE RENDIMIENTO (BASE DEL SCORE)"
         echo "==============================================================="
         echo "⏱️ Tiempo Promedio: ${AVG_TIME}s"
         echo "🧠 RAM Promedio:    ${AVG_RAM} KB"
