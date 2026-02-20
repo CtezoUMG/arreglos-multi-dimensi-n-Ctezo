@@ -19,5 +19,6 @@ for (int i = 1; i < n; i++) {
     
 }
 
+
 // Salida limpia (solo el número)
 Console.WriteLine(maximo);
