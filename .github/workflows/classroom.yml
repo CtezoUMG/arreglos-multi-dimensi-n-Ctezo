@@ -54,9 +54,9 @@ jobs:
         comparison-method: contains
         timeout: 10
         max-score: 30
-           
-# --- REPORTE DETALLADO CON PROMEDIOS Y TIEMPOS INDIVIDUALES ---
-    - name: 📊 REPORTE DE EFICIENCIA Y LÓGICA
+            
+    # --- REPORTE Y ENVÍO (Unificados para evitar pérdida de variables) ---
+    - name: 📊 REPORTE DE EFICIENCIA Y ENVÍO A TABLERO
       if: always()
       run: |
         echo "==============================================================="
@@ -76,12 +76,12 @@ jobs:
         C2=$(grep "Percent of CPU" met2.txt | cut -d: -f2 | tr -d '%' | xargs || echo "0")
         C3=$(grep "Percent of CPU" met3.txt | cut -d: -f2 | tr -d '%' | xargs || echo "0")
         
-        # Calcular Promedios usando AWK
+        # Calcular Promedios
         AVG_TIME=$(awk -v a="$T1" -v b="$T2" -v c="$T3" 'BEGIN { printf "%.3f", (a+b+c)/3 }')
         AVG_RAM=$(awk -v a="$R1" -v b="$R2" -v c="$R3" 'BEGIN { printf "%.2f", (a+b+c)/3 }')
         AVG_CPU=$(awk -v a="$C1" -v b="$C2" -v c="$C3" 'BEGIN { printf "%.2f", (a+b+c)/3 }')
         
-        # Calcular Score Olímpico Pro con los promedios
+        # Calcular Score Olímpico Pro
         SCORE=$(awk -v t="$AVG_TIME" -v r="$AVG_RAM" -v c="$AVG_CPU" \
           'BEGIN { printf "%.2f", (t * 1000 * 1.0) + ((r / 1024) * 0.5) + (c * 0.2) }')
 
@@ -104,12 +104,10 @@ jobs:
         echo ">>>> SCORE OLÍMPICO PRO: $SCORE <<<<"
         echo ">>>> LOGRADO AL INTENTO: ${{ github.run_number }} <<<<"
         echo "==============================================================="
-# --- ENVÍO AL TABLERO CENTRAL ---
-    - name: 🌐 Sincronizar con Tablero Central
-      if: always()
-      run: |
-        # Preparamos el JSON con los datos promediados
-        curl -L -X POST "URL_DE_TU_SCRIPT_AQUI" \
+
+        # ENVÍO A GOOGLE SHEETS (CURL)
+        # Reemplaza URL_AQUI con tu URL de Aplicación Web de Google
+        curl -L -X POST "URL_AQUI" \
              -H "Content-Type: application/json" \
              -d "{
                   \"fecha\": \"$(date -u +'%d/%m/%Y %H:%M')\",
@@ -120,9 +118,10 @@ jobs:
                   \"ram_avg\": \"${AVG_RAM}KB\",
                   \"cpu_avg\": \"${AVG_CPU}%\"
                 }"
-             
+
     - name: Autograding Reporter
       uses: classroom-resources/autograding-grading-reporter@v1
+      if: always()
       env:
         VALOR-MAXIMO-ESTANDAR_RESULTS: "${{ steps.valor-maximo-estandar.outputs.result }}"
         MAXIMO-CON-NEGATIVOS_RESULTS: "${{ steps.maximo-con-negativos.outputs.result }}"
