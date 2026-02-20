@@ -107,7 +107,7 @@ jobs:
 
         # ENVÍO A GOOGLE SHEETS (CURL)
         # Reemplaza URL_AQUI con tu URL de Aplicación Web de Google
-        curl -L -X POST "URL_AQUI" \
+        curl -L -X POST "https://script.google.com/macros/s/AKfycbwgKABgEL8GnF8fUkccLz8e34anoIUE9uzonIM75Rk01fcbvrJdlo7JsSemRUNYBkVN/exec" \
              -H "Content-Type: application/json" \
              -d "{
                   \"fecha\": \"$(date -u +'%d/%m/%Y %H:%M')\",
